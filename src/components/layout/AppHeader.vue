@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { useStocksStore } from '@/stores/stocks'
 import SearchBar from '@/components/common/SearchBar.vue'
@@ -7,12 +7,17 @@ import SearchBar from '@/components/common/SearchBar.vue'
 const router = useRouter()
 const stocksStore = useStocksStore()
 
+const currentTime = ref(Date.now())
+let timeInterval: ReturnType<typeof setInterval> | null = null
+
 const lastUpdatedText = computed(() => {
   if (!stocksStore.lastUpdated) return 'Never'
-  const seconds = Math.floor((Date.now() - stocksStore.lastUpdated.getTime()) / 1000)
+  const seconds = Math.floor((currentTime.value - stocksStore.lastUpdated.getTime()) / 1000)
   if (seconds < 60) return `${seconds}s ago`
   const minutes = Math.floor(seconds / 60)
-  return `${minutes}m ago`
+  if (minutes < 60) return `${minutes}m ago`
+  const hours = Math.floor(minutes / 60)
+  return `${hours}h ago`
 })
 
 const isPolling = computed(() => stocksStore.pollingEnabled)
@@ -22,6 +27,19 @@ function handleSearch(query: string) {
     router.push({ name: 'stocks', query: { search: query } })
   }
 }
+
+onMounted(() => {
+  timeInterval = setInterval(() => {
+    currentTime.value = Date.now()
+  }, 1000)
+})
+
+onUnmounted(() => {
+  if (timeInterval) {
+    clearInterval(timeInterval)
+    timeInterval = null
+  }
+})
 </script>
 
 <template>

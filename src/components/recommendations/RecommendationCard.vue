@@ -32,29 +32,28 @@ const ratingClass = computed(() => {
       class="card-hover relative overflow-hidden"
       :class="{ 'border-tv-blue': highlight, [scoreGlow]: highlight }"
     >
-      <div v-if="recommendation.rank <= 3" class="absolute top-0 right-0">
+      <div v-if="recommendation.rank <= 3" class="absolute top-0 left-0 z-10">
         <div
-          class="w-8 h-8 flex items-center justify-center text-sm font-bold"
+          class="w-10 h-10 flex items-center justify-center text-sm font-bold rounded-br-lg"
           :class="{
             'bg-yellow-500 text-black': recommendation.rank === 1,
             'bg-gray-400 text-black': recommendation.rank === 2,
             'bg-amber-700 text-white': recommendation.rank === 3
           }"
-          style="clip-path: polygon(100% 0, 0 0, 100% 100%)"
         >
-          {{ recommendation.rank }}
+          #{{ recommendation.rank }}
         </div>
       </div>
 
       <div class="flex items-start justify-between mb-4">
-        <div>
+        <div class="flex-1" :class="{ 'ml-12': recommendation.rank <= 3 }">
           <div class="flex items-center space-x-2">
             <span class="text-2xl font-bold text-tv-text">{{ recommendation.stock.ticker }}</span>
             <span :class="ratingClass">{{ recommendation.stock.rating_to }}</span>
           </div>
           <p class="text-sm text-tv-text-secondary mt-1">{{ recommendation.stock.company }}</p>
         </div>
-        <div class="text-right">
+        <div class="text-right flex-shrink-0 ml-4">
           <div :class="scoreColor" class="text-3xl font-bold">
             {{ recommendation.score.toFixed(1) }}
           </div>
